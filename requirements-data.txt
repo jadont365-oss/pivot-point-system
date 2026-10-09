@@ -1,0 +1,4 @@
+-r requirements.txt
+# Local collection and legacy JSON verification; never required by CI.
+thetadata==1.0.10
+jsonschema==4.26.0
