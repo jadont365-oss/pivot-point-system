@@ -1,0 +1,23 @@
+{
+  "purpose": "Byte-preserved original pivot source/config for initial Git release; update explicitly with reviewed future code changes.",
+  "files": {
+    "outputs/cash_touch_targets_cash_open_v3/run_test.py": "da1ba5cb29ee747a6a16c076f0d8facb003920983f5340fe2b4ec2fa970e0bbb",
+    "outputs/cash_touch_targets_composite_p_v2/run_test.py": "b49aa3ea113a274fe6911d5356e05ae914010108335d09daa3413262289f5b23",
+    "outputs/cash_touch_targets_v1/contract.json": "d12519f5db01cd6acd34fbcc1878f5cbb5b53162572a316294aae2778e60f0cf",
+    "outputs/cash_touch_targets_v1/run_test.py": "871979ed376fd57f44a8cd608330572c93ea73c1d993ac046bc0be5abde2cf07",
+    "outputs/composite_pivots/engine.py": "bd6b8e84a6c6dfc332ca433b1d2a0e64902cdb3a3644237d4fb6d0d1ae2f9941",
+    "outputs/composite_pivots/week_test_2026-09-28_2026-10-02/run_week_test.py": "77df40f9981cb649436aa4afa78e04f4eeef4b5ce58e76113aad9a727f42f1e2",
+    "outputs/composite_pivots_context_v3/cash_rebuild.py": "cb9a9c548076a6f52290cee81135a4fbfa917cfc8da5cfcb9250590a2c1d1ceb",
+    "outputs/composite_pivots_context_v3/context.py": "bac1c0f2f1c5b737e6668373d6a16c8cef54ed59b20832f25a479b68098e734c",
+    "outputs/pivot_algorithm/README.md": "ec0225421f9b092212a3af0b6e099c922ecebbe7de75d8f66a50b43a3364d9c8",
+    "outputs/pivot_algorithm/algorithm.py": "767cfb958f50af0691053064f59583bc49644a50ed33eb6f060b66d6bfe5b7fb",
+    "outputs/pivot_algorithm/run_pivots.py": "09984cf28224de54d591f01f8a125b52a3e6a6073c9b389eca0e9025f521fe34",
+    "outputs/pivot_algorithm/test_algorithm.py": "cf1f9548d40400ac7f9ad41cf6373ec58f82e447b7b7857a47abd77a1289e111",
+    "outputs/pivot_algorithm/verify_run.py": "b2e44483b19979366ce89ce0aae1e99acc05d8c2a9cc3a1f102c593521c0d65b",
+    "outputs/pivot_json/README.md": "e6f58ca6d03fd6330847dd727276835f58dd238378eebdaafc0dc919e62f2680",
+    "outputs/pivot_json/export_daily.py": "fe73b8c225e69cdbdd1e0097b697647d32724001baa86e99e59e652e47c3135e",
+    "outputs/pivot_json/schema.json": "2f084de5c4d4d177cc8b6a689ef0d2f1566b40bfc3bec920bca462969c3065ff",
+    "outputs/pivot_json/test_export_daily.py": "f3802e26c917e0771abac786cf8106864c568e7f254eabfac0e334e47f9324b1",
+    "outputs/qqq_range/collect.py": "a75c441b01aff25ca8e1aa75ebf12892eaf5dad07413518d041b53153439b402"
+  }
+}

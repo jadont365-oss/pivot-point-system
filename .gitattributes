@@ -1,0 +1,3 @@
+# Normalize new repository infrastructure; preserve existing hash-bound outputs.
+* text=auto eol=lf
+outputs/** -text

@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:qqq:cash-open-pivots:daily:1.0.0",
+  "title": "Frozen QQQ cash-open V3 daily export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_version", "instrument", "session", "timing", "forecast", "research_evidence", "data_quality", "provenance", "llm_guidance"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "model_version": {"const": "cash_touch_targets_cash_open_v3"},
+    "instrument": {
+      "type": "object", "additionalProperties": false,
+      "required": ["symbol", "asset_class", "currency"],
+      "properties": {"symbol": {"const": "QQQ"}, "asset_class": {"const": "equity_ETF"}, "currency": {"const": "USD"}}
+    },
+    "session": {
+      "type": "object", "additionalProperties": false,
+      "required": ["date", "timezone", "cash_start", "cash_end", "cash_end_exclusive", "cash_minutes"],
+      "properties": {
+        "date": {"$ref": "#/$defs/date"}, "timezone": {"const": "America/New_York"},
+        "cash_start": {"$ref": "#/$defs/timestamp"}, "cash_end": {"$ref": "#/$defs/timestamp"},
+        "cash_end_exclusive": {"const": true}, "cash_minutes": {"enum": [210, 390]}
+      }
+    },
+    "timing": {
+      "type": "object", "additionalProperties": false,
+      "required": ["forecast_as_of", "prior_distances_as_of", "exported_at_utc", "forecast_publication_status", "prior_input_availability_status", "archive_vintage"],
+      "properties": {
+        "forecast_as_of": {"$ref": "#/$defs/timestamp"}, "prior_distances_as_of": {"$ref": "#/$defs/timestamp"},
+        "exported_at_utc": {"$ref": "#/$defs/timestamp"},
+        "forecast_publication_status": {"const": "reconstructed_not_historically_published"},
+        "prior_input_availability_status": {"const": "assumed_17_15_Eastern_not_observed_receipt"},
+        "archive_vintage": {"const": "retrospective_latest"}
+      }
+    },
+    "forecast": {
+      "type": "object", "additionalProperties": false,
+      "required": ["anchor", "levels", "price_units", "inputs", "calculation", "latest_option_pair", "probabilities"],
+      "properties": {
+        "anchor": {
+          "type": "object", "additionalProperties": false,
+          "required": ["name", "price", "observed_cash_open", "definition", "timestamp_kind"],
+          "properties": {"name": {"const": "P"}, "price": {"$ref": "#/$defs/positive"},
+                         "observed_cash_open": {"$ref": "#/$defs/positive"}, "definition": {"$ref": "#/$defs/text"}, "timestamp_kind": {"$ref": "#/$defs/text"}}
+        },
+        "levels": {
+          "type": "object", "additionalProperties": false,
+          "required": ["P", "R1", "R2", "R3", "S1", "S2", "S3"],
+          "properties": {"P": {"$ref": "#/$defs/level"}, "R1": {"$ref": "#/$defs/level"}, "R2": {"$ref": "#/$defs/level"},
+                         "R3": {"$ref": "#/$defs/level"}, "S1": {"$ref": "#/$defs/level"}, "S2": {"$ref": "#/$defs/level"}, "S3": {"$ref": "#/$defs/level"}}
+        },
+        "price_units": {"const": "USD_per_share"},
+        "inputs": {
+          "type": "object", "additionalProperties": false,
+          "required": ["lookback_sessions", "prior_sessions", "variance_definition", "variance_units", "iv_definition", "iv_units", "current_session_input", "inputs_not_used"],
+          "properties": {
+            "lookback_sessions": {"const": 20},
+            "prior_sessions": {"type": "array", "minItems": 20, "maxItems": 20, "items": {"$ref": "#/$defs/priorSession"}},
+            "variance_definition": {"$ref": "#/$defs/text"}, "variance_units": {"const": "squared_log_return"},
+            "iv_definition": {"$ref": "#/$defs/text"}, "iv_units": {"const": "annual_decimal"},
+            "current_session_input": {"const": "opening_price_only"},
+            "inputs_not_used": {"const": ["volume", "other_Greeks", "profile_levels", "VWAP", "ADX", "RVOL", "composite_features"]}
+          }
+        },
+        "calculation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["scale_reference_price", "mean_normalized_cash_variance_390", "target_duration_factor", "target_cash_log_return_variance", "historical_cash_sigma_dollars", "latest_annual_atm_iv_decimal", "mean_20_annual_atm_iv_decimal", "iv_ratio", "adjusted_cash_sigma_dollars", "formula", "rounding", "baseline_levels", "translation_delta_dollars"],
+          "properties": {
+            "scale_reference_price": {"$ref": "#/$defs/positive"}, "mean_normalized_cash_variance_390": {"$ref": "#/$defs/positive"},
+            "target_duration_factor": {"$ref": "#/$defs/positive"}, "target_cash_log_return_variance": {"$ref": "#/$defs/positive"},
+            "historical_cash_sigma_dollars": {"$ref": "#/$defs/positive"}, "latest_annual_atm_iv_decimal": {"$ref": "#/$defs/iv"},
+            "mean_20_annual_atm_iv_decimal": {"$ref": "#/$defs/iv"}, "iv_ratio": {"$ref": "#/$defs/positive"},
+            "adjusted_cash_sigma_dollars": {"$ref": "#/$defs/positive"}, "formula": {"$ref": "#/$defs/text"}, "rounding": {"$ref": "#/$defs/text"},
+            "baseline_levels": {"$ref": "#/$defs/prices"}, "translation_delta_dollars": {"type": "number"}
+          }
+        },
+        "latest_option_pair": {"$ref": "#/$defs/optionPair"},
+        "probabilities": {
+          "type": "object", "additionalProperties": false,
+          "required": ["empirical_touch_probability", "empirical_probability_status", "either_side_touch_probability", "theoretical_single_side_touch"],
+          "properties": {
+            "empirical_touch_probability": {"type": "null"}, "empirical_probability_status": {"const": "not_calibrated"}, "either_side_touch_probability": {"type": "null"},
+            "theoretical_single_side_touch": {
+              "type": "object", "additionalProperties": false, "required": ["formula", "scope", "assumptions", "z_definition", "rates"],
+              "properties": {
+                "formula": {"const": "2 * (1 - Phi(z)) = erfc(z/sqrt(2))"}, "scope": {"const": "one_upper_or_one_lower_fixed_level"},
+                "assumptions": {"$ref": "#/$defs/text"}, "z_definition": {"$ref": "#/$defs/text"},
+                "rates": {
+                  "type": "object", "additionalProperties": false, "required": ["R1", "S1", "R2", "S2", "R3", "S3"],
+                  "properties": {"R1": {"$ref": "#/$defs/probability"}, "S1": {"$ref": "#/$defs/probability"},
+                                 "R2": {"$ref": "#/$defs/probability"}, "S2": {"$ref": "#/$defs/probability"}, "R3": {"$ref": "#/$defs/probability"}, "S3": {"$ref": "#/$defs/probability"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "research_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["timing_status", "available_at_original_forecast", "touch_definition", "cohorts", "pooled_calibrated_probability", "interpretation"],
+      "properties": {
+        "timing_status": {"const": "POSTHOC_NOT_AVAILABLE_AT_FORECAST"}, "available_at_original_forecast": {"const": false},
+        "touch_definition": {"$ref": "#/$defs/text"}, "cohorts": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/cohort"}},
+        "pooled_calibrated_probability": {"type": "null"}, "interpretation": {"$ref": "#/$defs/text"}
+      }
+    },
+    "data_quality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["archive_status", "live_freshness", "event_age_seconds", "historical_publication_vintage", "exact_tick_execution", "missing_information"],
+      "properties": {
+        "archive_status": {"const": "frozen_retrospective_ThetaData"}, "live_freshness": {"const": "unverified"}, "event_age_seconds": {"type": "null"},
+        "historical_publication_vintage": {"const": "unknown"}, "exact_tick_execution": {"const": "unverified"},
+        "missing_information": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}}
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sources", "hash_algorithm", "path_base", "source_binding_status"],
+      "properties": {"sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+                     "hash_algorithm": {"const": "SHA-256"}, "path_base": {"const": "project_workspace_root"}, "source_binding_status": {"const": "verified_at_export"}}
+    },
+    "llm_guidance": {"type": "array", "minItems": 6, "items": {"$ref": "#/$defs/text"}}
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1},
+    "date": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "iv": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 5},
+    "probability": {"type": "number", "minimum": 0, "maximum": 1},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "path": {"type": "string", "pattern": "^outputs/", "minLength": 9},
+    "source": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "role"],
+      "properties": {"path": {"$ref": "#/$defs/path"}, "sha256": {"$ref": "#/$defs/hash"}, "role": {"$ref": "#/$defs/text"}}
+    },
+    "level": {
+      "type": "object", "additionalProperties": false, "required": ["price", "signed_offset_dollars", "multiplier", "definition"],
+      "properties": {"price": {"$ref": "#/$defs/positive"}, "signed_offset_dollars": {"type": "number"}, "multiplier": {"enum": [null, 0.38, 0.67, 1.0]}, "definition": {"$ref": "#/$defs/text"}}
+    },
+    "prices": {
+      "type": "object", "additionalProperties": false, "required": ["P", "R1", "R2", "R3", "S1", "S2", "S3"],
+      "properties": {"P": {"$ref": "#/$defs/positive"}, "R1": {"$ref": "#/$defs/positive"}, "R2": {"$ref": "#/$defs/positive"},
+                     "R3": {"$ref": "#/$defs/positive"}, "S1": {"$ref": "#/$defs/positive"}, "S2": {"$ref": "#/$defs/positive"}, "S3": {"$ref": "#/$defs/positive"}}
+    },
+    "priorSession": {
+      "type": "object", "additionalProperties": false, "required": ["date", "normalized_cash_log_return_variance_390", "annual_atm_iv_decimal", "availability_assumed_at", "option_snapshot_status"],
+      "properties": {"date": {"$ref": "#/$defs/date"}, "normalized_cash_log_return_variance_390": {"$ref": "#/$defs/positive"},
+                     "annual_atm_iv_decimal": {"$ref": "#/$defs/iv"}, "availability_assumed_at": {"$ref": "#/$defs/timestamp"},
+                     "option_snapshot_status": {"enum": ["available_frozen_snapshot", "missing_snapshot"]}}
+    },
+    "optionContract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["symbol", "expiration", "strike", "right", "timestamp", "underlying_timestamp", "bid", "ask", "delta", "implied_vol", "iv_error", "underlying_price"],
+      "properties": {
+        "symbol": {"const": "QQQ"}, "expiration": {"$ref": "#/$defs/date"}, "strike": {"$ref": "#/$defs/positive"}, "right": {"enum": ["CALL", "PUT"]},
+        "timestamp": {"$ref": "#/$defs/timestamp"}, "underlying_timestamp": {"$ref": "#/$defs/timestamp"},
+        "bid": {"$ref": "#/$defs/positive"}, "ask": {"$ref": "#/$defs/positive"}, "delta": {"type": "number", "minimum": -0.9, "maximum": 0.9},
+        "implied_vol": {"$ref": "#/$defs/iv"}, "iv_error": {"type": "number", "minimum": -0.01, "maximum": 0.01}, "underlying_price": {"$ref": "#/$defs/positive"}
+      }
+    },
+    "optionPair": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "prior_session_date", "annual_iv_decimal", "contracts", "source_file", "source_sha256", "prior_cash_open", "prior_cash_close", "raw_rows", "eligible_rows", "selection_and_quality_definition", "selection_status", "units"],
+      "properties": {
+        "status": {"enum": ["available_frozen_snapshot", "missing_snapshot"]}, "prior_session_date": {"$ref": "#/$defs/date"}, "annual_iv_decimal": {"$ref": "#/$defs/iv"},
+        "contracts": {"oneOf": [{"type": "null"}, {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/optionContract"}}]},
+        "source_file": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/path"}]}, "source_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/hash"}]},
+        "prior_cash_open": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}, "prior_cash_close": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]},
+        "raw_rows": {"type": ["integer", "null"], "minimum": 2}, "eligible_rows": {"type": ["integer", "null"], "minimum": 2},
+        "selection_and_quality_definition": {"$ref": "#/$defs/text"}, "selection_status": {"enum": ["copied_frozen_selection_not_reselected", "missing"]},
+        "units": {"const": {"bid_ask_strike_underlying_price": "USD_per_share", "implied_vol": "annual_decimal", "delta": "dimensionless", "iv_error": "provider_raw_decimal_field"}}
+      },
+      "allOf": [{"if": {"properties": {"status": {"const": "missing_snapshot"}}},
+                 "then": {"properties": {"contracts": {"type": "null"}, "source_file": {"type": "null"}, "source_sha256": {"type": "null"}, "prior_cash_open": {"type": "null"}, "prior_cash_close": {"type": "null"}, "raw_rows": {"type": "null"}, "eligible_rows": {"type": "null"}, "selection_status": {"const": "missing"}}},
+                 "else": {"properties": {"contracts": {"type": "array"}, "source_file": {"type": "string"}, "source_sha256": {"type": "string"}, "prior_cash_open": {"type": "string"}, "prior_cash_close": {"type": "string"}, "raw_rows": {"type": "integer"}, "eligible_rows": {"type": "integer"}, "selection_status": {"const": "copied_frozen_selection_not_reselected"}}}}]
+    },
+    "metric": {
+      "type": "object", "additionalProperties": false, "required": ["count", "denominator", "rate"],
+      "properties": {"count": {"type": "integer", "minimum": 0}, "denominator": {"type": "integer", "minimum": 1}, "rate": {"$ref": "#/$defs/probability"}}
+    },
+    "metrics": {
+      "type": "object", "additionalProperties": false, "required": ["R1", "S1", "R2", "S2", "R3", "S3", "either_R1_S1", "both_R1_S1", "neither_R1_S1"],
+      "properties": {"R1": {"$ref": "#/$defs/metric"}, "S1": {"$ref": "#/$defs/metric"}, "R2": {"$ref": "#/$defs/metric"}, "S2": {"$ref": "#/$defs/metric"},
+                     "R3": {"$ref": "#/$defs/metric"}, "S3": {"$ref": "#/$defs/metric"}, "either_R1_S1": {"$ref": "#/$defs/metric"}, "both_R1_S1": {"$ref": "#/$defs/metric"}, "neither_R1_S1": {"$ref": "#/$defs/metric"}}
+    },
+    "outcomes": {
+      "type": "object", "additionalProperties": false, "required": ["R1", "S1", "R2", "S2", "R3", "S3", "either_R1_S1", "both_R1_S1", "neither_R1_S1"],
+      "properties": {"R1": {"type": "boolean"}, "S1": {"type": "boolean"}, "R2": {"type": "boolean"}, "S2": {"type": "boolean"}, "R3": {"type": "boolean"}, "S3": {"type": "boolean"},
+                     "either_R1_S1": {"type": "boolean"}, "both_R1_S1": {"type": "boolean"}, "neither_R1_S1": {"type": "boolean"}}
+    },
+    "cohort": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "scope", "consumed_status", "provider", "sample_size", "evaluated_dates", "source_report_created_at", "source_report_timestamp_status", "timing_status", "available_at_original_forecast", "counts_independently_recounted", "count_crosscheck", "daily", "measured_rates", "denominator_definition"],
+      "properties": {
+        "id": {"enum": ["cash_touch_targets_cash_open_v3", "cash_touch_targets_month_2026_08", "cash_touch_targets_holdout_2025_09", "cash_touch_targets_holdout_2025_07"]},
+        "scope": {"enum": ["development_week", "retrospective_month_replay", "first_unused_historical_holdout_at_evaluation"]},
+        "consumed_status": {"enum": ["consumed_development", "previously_consumed_retrospective", "now_consumed_once"]},
+        "provider": {"const": "ThetaData"}, "sample_size": {"enum": [5, 21, 22]},
+        "evaluated_dates": {"type": "array", "minItems": 5, "maxItems": 22, "uniqueItems": true, "items": {"$ref": "#/$defs/date"}},
+        "source_report_created_at": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}, "source_report_timestamp_status": {"enum": ["recorded", "not_recorded"]},
+        "timing_status": {"const": "POSTHOC_NOT_AVAILABLE_AT_FORECAST"}, "available_at_original_forecast": {"const": false},
+        "counts_independently_recounted": {"const": true}, "count_crosscheck": {"const": "passed"},
+        "daily": {"type": "array", "minItems": 5, "maxItems": 22, "items": {
+          "type": "object", "additionalProperties": false, "required": ["date", "cash_minutes", "cash_end", "outcomes"],
+          "properties": {"date": {"$ref": "#/$defs/date"}, "cash_minutes": {"enum": [210, 390]}, "cash_end": {"$ref": "#/$defs/timestamp"}, "outcomes": {"$ref": "#/$defs/outcomes"}}
+        }},
+        "measured_rates": {"$ref": "#/$defs/metrics"}, "denominator_definition": {"$ref": "#/$defs/text"}
+      }
+    }
+  }
+}
