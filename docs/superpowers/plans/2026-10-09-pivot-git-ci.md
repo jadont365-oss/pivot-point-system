@@ -21,21 +21,21 @@
 
 ## Tasks
 
-- [ ] **1. Preserve and version the baseline.**
+- [x] **1. Preserve and version the baseline.**
   - Record SHA-256 for every original output artifact and parent Git HEAD/index/config in `.unlazy/git-ci/before.json`.
   - Add a fail-closed root `.gitignore`: track only required Python sources, original V1 contract, JSON schema, selected guides and the new setup files. Exclude all downloaded data, results, keys, environments and `.worktrees/`.
   - Add `.gitattributes` with `outputs/** -text` so original bound bytes survive Windows checkout.
   - Initialize this root with `git init -b main`; confirm `git rev-parse --show-toplevel` equals this directory before staging.
   - Commit the audited existing baseline. Create `.worktrees/git-ci` on `setup/git-ci` only after `git check-ignore .worktrees/git-ci` succeeds.
 
-- [ ] **2. Add minimal portable CI in the isolated worktree.**
+- [x] **2. Add minimal portable CI in the isolated worktree.**
   - Add `requirements.txt` (offline dependencies), `requirements-data.txt` (ThetaData), root `README.md` (Windows setup, formula, local-only data, testing and live limitations).
   - Add `SOURCE_MANIFEST.json` for the byte-identical original source/config files.
   - Add `tests/test_ci.py`: construct 20 complete synthetic prior cash sessions, qualified next-session ATM option pairs and a cash-open observation; independently verify variance/IV/rounding and every level for QQQ and SPY; cover missing/future cash data, wrong instrument, invalid option IV/clock/expiry, half-day normalization, rejected opening clocks, outcome-independent spacing, touch semantics and finite detailed JSON.
   - Add `scripts/check_repository.py`: audit tracked filenames/content, original-source hashes and secret patterns without printing values. Include a positive synthetic secret control in the tests.
   - Add `.github/workflows/ci.yml`: on push/pull_request/manual dispatch, Windows runner, Python 3.12, SHA-pinned official checkout/setup-python, read-only token, offline requirements; run repository audit, synthetic tests and historical CLI `--help`. No API keys or downloads.
 
-- [ ] **3. Verify before publication.**
+- [x] **3. Verify before publication.**
   - Run `python -m unittest discover -s tests -v`; require zero failures.
   - Run `python scripts/check_repository.py`; require audit success and no forbidden tracked files.
   - Run the two original local suites with the existing environment: `python -m unittest discover -s outputs/pivot_algorithm -p test_*.py -v` and `python -m unittest discover -s outputs/pivot_json -p test_*.py -v` from the original project; require all pass without rewriting artifacts.
